@@ -1,0 +1,137 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{indentfirst}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\author{Nguyen Duc Hieu}
+\title{\textbf{Frequent Subgraph Mining \\with ``Think like an embedding''-Approach}}
+
+\begin{document}
+\maketitle
+\newpage
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\section{Problems of Frequent Subgraph Mining}
+In this section we will get introduced to Frequent Subgraph Mining (FSM).
+The goal of data mining is to extract inferences and information from given data.
+In FSM we treat particular data which are represented by using graphs.
+For FSM there are two types of problem formulation: \textbf{graph transaction based FSM} and \textbf{single graph based FSM}.
+In graph-transaction based FSM the input is a collection of medium-sized graphs called \textit{transactions}.
+\\
+
+Let \textbf{\textit{g}} b a subgraph. \textit{g} is considered frequent if its \textit{occurrence count} is greater than some predefined threshold.
+The occurrence count for a subgraph is also referred as its \textit{support} and the threshold is referred to as the \textit{support threshold}.
+The support of \textit{g} is being computed by using either \textit{transaction-based counting} or \textit{occurrence-based counting}.
+Transaction-based counting is only being used for transaction based FSM,
+while occurrence-based counting can be used for either transaction based FSM or single graph based FSM.
+
+In transaction-based counting the support is defined by the number of graph transactions in that \textit{g} occurs.
+It is irrelevant whether \textit{g} occurs one or multiple times in a particular graph transaction.
+Thus, given a database $\mathcal{G} = \{ G_{1},G_{2},\dots,G_{T} \}$
+
+
+
+
+
+\subsection{Terminologies and Formalism}
+In this subsection we will go through some definitions in order to obtain a better understanding on the subject FSM.
+Generally a graph is defined by a set of vertexes and a set of edges which represent the interconnections between the vertexes.
+The graphs used for FSM are assumed to be \textit{labelled simple graphs}.
+In the following 
+\\
+
+\begin{samepage}
+\noindent \textbf{Labelled Graph:}\\
+Let $G(V,E,L_{V},L_{E},\varphi)$ be a labelled graph.
+$V$ is a set of vertexes and $E \subseteq V \times V$ is a set of edges;
+$L_{V}$ and $L_{E}$ are sets of vertex and edge labels;
+and $\varphi$ is a label function that defines the mappings $V \rightarrow L_{V}$ and $E \rightarrow L_{E}$.\\
+\end{samepage}
+
+
+\begin{samepage}
+\noindent \textbf{Subgraph:}\\
+Let two labelled graphs be given: $G_{1}(V_{1},E_{1},L_{V_{1}},L_{E_{1}},\varphi_{1})$ and $G_{2}(V_{2},E_{2},L_{V_{2}},L_{E_{2}},\varphi_{2})$.
+$G_{1}$ is a subgraph of $G_{2}$, if $G_{1}$ satisfies following points: \\
+(i) $V_{1} \subseteq V_{2}$ and 
+$\forall v \in V_{1}, \varphi_{1}(v) = \varphi_{2}(v)$,\\
+(ii) $E_{1} \subseteq E_{2}$ and $\forall (u,v) \in E_{1}, \varphi_{1}(u,v) = \varphi_{2}(u,v)$.\\
+%$G_{1}$ is an \textbf{induced subgraph} of $G_{2}$, if $G_{1}$ further satisfies: $\forall u,v \in V_{1}, (u,v) \in E_{1} \Leftrightarrow (u,v) \in E_{2}$, in addition to the above conditions.
+$G_{2}$ is also a supergraph of $G_{1}$.\\
+\end{samepage}
+
+
+
+\begin{samepage}
+\noindent  \textbf{Graph Isomorphism:}\\
+A graph $G_{1}(V_{1},E_{1},L_{V_{1}},L_{E_{1}},\varphi_{1})$ is isomorphic to another graph $G_{2}(V_{2},E_{2},L_{V_{2}},L_{E_{2}},\varphi_{2})$, if and only if a bijection $f:V_{1 \rightarrow V_{2}}$ exists such that:\\
+(i) $\forall u \in V_{1}, \varphi_{1}(u) = \varphi_{2}(f(u))$,\\
+(ii) $\forall (u,v) \in E_{1} \Leftrightarrow (f(u),f(v)) \in E_{2}$,\\
+(iii) $\forall (u,v) \in E_{1}, \varphi_{1}(u,v) = \varphi_{2}(f(u),f(v))$.\\
+The bijection $f$ is an isomorphism between $G_{1}$ and $G_{2}$. 
+A graph $G_{1}$ is \textbf{subgraph isomorphic} to a graph $G_{2}$, if and only if there exists a subgraph $g \subseteq G_{2}$ such that $G_{1}$ is isomorphic to $g$. 
+In this case $g $ is called an \textbf{embedding} of $G_{1}$ in $G_{2}$.\\
+\end{samepage}
+
+
+\begin{samepage}
+\noindent \textbf{Lattice:}\\
+Given a database $\mathcal{G}$, a lattice is a structural form used to model the search space for finding frequent subgraphs, where each vertex represents a connected subgraph of the graph in $\mathcal{G}$. 
+A vertex $p$ is a patent of the vertex $q$ in the lattice, if $q$ is a child of $p$. All the subgraphs of each graph $G_{i} \in \mathcal{G}$ which ouccur in the database are present in the lattice and every subgraph occurs only once in it.\\
+
+%Picture of a Lattice
+
+%\noindent \textit{Example:} given a graph data set $\mathcal{G}=\{G_{1},G_{2},G_{3},G_{4}\}$, the corresponding $Lattice(\mathcal{G})$\iffalse, is given in Figure 2\fi. The lowest vertex $\phi$ represents the empty subgraph, and the vertexes at the highest level correspond to $G_{1}$, $G_{2}$, $G_{3}$ and $G_{4}$. The parents of the subgraph $B-D$ are subgraphs $A-B-D$ (joining the edge $A-B$) and $B-D-G$ (joining the edge $D-G$).
+\end{samepage}
+
+
+
+
+\subsection{Overview of FSM}
+In this section we will have an overview of the process of FSM. 
+The methods of FSM can be divided into two categories: (i) Apriori-based approaches and (i) the pattern growth-based approaches.
+The Apriori-based approach uses a Breadth First Search (BFS) strategy to explore the subgraph lattice of a data set, while the pattern growth-based one uses the Depth First Search (DFS) strategy.
+The Apriori-based approach has to check all \textit{k}-level subgraphs before considering \textit{(k+1)}-level subgraphs.
+The pattern growth-based approach searches for subgraphs by extending each discovered subgraph \textit{g} which is extended recursively until all frequent subgraphs are discovered.
+
+\subsubsection{Canonical Representation}
+There are several methods of representing a graph structure. Two simple and most commonly used ones are the use of \textit{adjacency matrix} and \textit{adjacency list}.
+
+
+\section{Pregel and MapReduce}
+\section{Arabesque}
+Compared to Pregel and MapReduce, Arabesque does not use the approach of TLV or 
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
